@@ -11,8 +11,8 @@ class SecondConstrain : public Component{
 		}
 
 		double* include(double param){
+			matrix[0][0] = 0. ; matrix[0][1] = 0. ; matrix[0][2] = 0;
 			matrix[0][0] = 0. ; matrix[0][1] = 0. ; matrix[0][2] = dt / dn;
-			matrix[0][0] = 0. ; matrix[0][1] = 0. ; matrix[0][2] = -dt / dn;
 			return &matrix[0][0];
 		}
 };

@@ -12,8 +12,8 @@
 
 #define REENTRANT
 #define C 1
-#define WIDTH 100.
-#define HEIGHT 100.
+#define WIDTH 10.
+#define HEIGHT 10.
 #define MaxToGnuPlot 101.
 
 double* test = new double[100 * 100];
@@ -37,8 +37,9 @@ typedef struct{
 Plate* plate;
 double** voltage;
 int countThreads;
-int x , dx;
-int y , dy;
+int x;
+int y;
+double dx , dy;
 
 void printMat(double* mat , int yi , int xi){
 	for(int i = 0 ; i < yi ; i++){
@@ -50,24 +51,21 @@ void printMat(double* mat , int yi , int xi){
 
 Plate* createPlate(int x , int y , double** voltage){
 	Plate* plate = new Plate(x * y + 1, voltage);
-	for(int node = 1 ; node <= (x * y) ; node++){
-		if(node % x != 0){
-			plate -> addComponent(node , node + 1 , new Temperature(C , dx));
-		}
-		else{
-			plate -> addComponent(0 , node , new FirstConstrain(100));
-			plate -> addComponent(node , 0 , new Temperature(C , dx));
-			plate -> addComponent(0 , node - x + 1 , new Temperature(C , dx));
-		}
-		if((node - 1) / x < y - 1){
-			plate -> addComponent(node , node + x , new Temperature(C , dy));
-		}
-		else{
-			plate -> addComponent(0 , node , new FirstConstrain(100)); 
-			plate -> addComponent(node , 0 , new Temperature(C , dy));
-			plate -> addComponent(0 , (node - 1) % x + 1, new Temperature(C , dy));
+	for(int i = 1  , j; i < y - 1 ; i++){
+		plate -> addComponent(i * x + 1 , i * x + 2 , new Temperature(C * C , dy));
+		plate -> addComponent(i + 1 , i + 1 + x , new Temperature(C * C , dx));
+		plate -> addComponent(0 , i * x + 1 , new FirstConstrain(100));
+		plate -> addComponent(i * x + x - 1 , i * x + x , new SecondConstrain(dy ,-10));
+		for(j = 1 ; j < x - 1 ; j++){
+			plate -> addComponent(i * x + j + 1 , i * x + j + 2  , new Temperature(C * C , dy));
+			plate -> addComponent(i * x + j + 1 , i * x + j + 1 + x , new Temperature(C * C , dx));
 		}
 	}
+	plate -> addComponent(0 , 1 , new FirstConstrain(100));
+	plate -> addComponent(0 , x , new FirstConstrain(100));
+	plate -> addComponent(0 , x * y , new FirstConstrain(100));
+	plate -> addComponent(0 , x * (y - 1) + 1 , new FirstConstrain(100));
+
 	return plate;
 }
 
@@ -193,8 +191,8 @@ void* action(void* v_arg){
 int main(int argc , char** argv){
 	x = atoi(argv[1]);
 	y = atoi(argv[2]);
-	dx = WIDTH / x;
-	dy = HEIGHT / y;
+	dx = WIDTH / (x - 1);
+	dy = HEIGHT / (y - 1);
 	int countNodes = x * y , currentProc;
 
 	voltage = new double*[countNodes + 1];
