@@ -1,3 +1,4 @@
+#include <mpi.h>
 #include "system/Plate.cpp"
 #include <stdio.h>
 #include "system/Components/Temperature.cpp"
@@ -7,7 +8,6 @@
 #include <pthread.h>
 #include <string.h>
 #include <sys/time.h>
-#include <mpi.h>
 
 
 #define REENTRANT
