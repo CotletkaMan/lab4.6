@@ -1,0 +1,2 @@
+Архивирование проекта ::  tar -cf archiveName.tar SourceDIR/
+Распаковка :: tar -xfv archiveName.tar
